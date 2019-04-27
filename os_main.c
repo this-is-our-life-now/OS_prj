@@ -6,11 +6,11 @@ Simple OS for Arduino
 
 /*-----------------------------------------------
 TODO:
-    >process management/threading/scheduling
-    >some sort of file sys on SD card
-    >timer along with 7 segment display
-    >LCD display for statuses
-    >some sort of input sensor stuff so we
+    > process management/threading/scheduling
+    > some sort of file sys on SD card
+    > timer along with 7 segment display
+    > LCD display for statuses
+    > some sort of input sensor stuff so we
     have a reason to write to files/log stuff
 -----------------------------------------------*/
 
@@ -19,7 +19,9 @@ TODO:
 #include "lcd_display.c"
 #include "processing.c"
 
-int main()
+void setup()
 {
-
+    lcd();
 }
+
+void loop(){}
