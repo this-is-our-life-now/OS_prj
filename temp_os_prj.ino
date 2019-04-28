@@ -1,3 +1,4 @@
+#include <ArduinoSTL.h>
 #include <LiquidCrystal.h>
 #include <IRremote.h>
 #include <String.h>
@@ -6,7 +7,13 @@
 // constants
 const int TEMP = 0;
 const int HUMIDITY = 1;
+const int PHOTO_PRCSS = 1;
+const int TEMP_PRCSS = 2;
+const int HUM_PRCSS = 3;
 // probably move all inits into one area like up here
+
+// our vector of processes
+std::vector<int> processes;
 
 void setup()
 {
@@ -15,13 +22,17 @@ void setup()
     
     lcd_display( "thisisourlifenow", "ft KP,PH,&MC" );
     lcd_display( "thisisourlifenow", "ft KP,PH,&MC" ); //just cuz
-    //ir_input();
+    //remote_input();
     //dht_input( TEMP );
-    dht_input( HUMIDITY );
+    //dht_input( HUMIDITY );
+    //photo_input();
 
 }
 
-void loop(){}
+void loop()
+{
+    remote_input();
+}
 
 /*---------------------------LCD Section---------------------------*/
 
@@ -36,7 +47,7 @@ void lcd_display( String process, String msg )
     lcd.begin( 16, 2 );
     lcd.setCursor( 0,0 );
     lcd.print( process );
-    lcd.print( ": " );
+    lcd.print( ":" );
     lcd.setCursor(0,1);
     lcd.print( "  " );
     lcd.print( msg );
@@ -71,11 +82,11 @@ values perbutton press so the corresponding values
 and logic will have to be tested
 --------------------------------------------------------*/
 
-void ir_input()
+void remote_input()
 {
     ir_receiver.enableIRIn();
 
-    while( true ) // eventually these won't go infinitely when we handle processes properly
+    while( true )
     {
         if ( ir_receiver.decode( &results ) )
         {
@@ -85,8 +96,9 @@ void ir_input()
     }
 }
 
-// initialize DHT11 (humidity/temp sensor)
+/*---------------------------Sensor Section---------------------------*/
 
+// initialize DHT11 (humidity/temp sensor)
 const int dht_pin = 7;
 DHT dht( dht_pin, DHT11 );
 
@@ -128,5 +140,16 @@ void dht_input( int data_type )
             }
             lcd_display( "DHT Humidity", String( input ) );
         }
+    }
+}
+
+// initialize photoresistor
+const int photo_pin = A0;
+
+void photo_input()
+{
+    while( true ) // eventually these won't go infinitely when we handle processes properly
+    {
+        lcd_display( "Photoresistor", String( analogRead( photo_pin ) ) );
     }
 }

@@ -17,10 +17,10 @@ Further Process Ideas:
         results in their own files, also log
         process times in its own file maybe
     > Using DHT11 temp/humidity sensor
-        button 1: log temp
-        button 2: log humidity
+        button 2: log temp
+        button 3: log humidity
     > using photoresisitor
-        button 3: light val
+        button 1: light val
     > using tilt switch
         button 4: tilt val
 
