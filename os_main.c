@@ -6,12 +6,13 @@ Simple OS for Arduino
 
 /*-----------------------------------------------
 TODO:
-    > process management/threading/scheduling
-    > some sort of file sys on SD card
-    > 7 segment display for process times
-    > LCD display for statuses
-    > some sort of input sensor stuff so we
-    have a reason to write to files/log stuff
+    > some sort of file sys on SD card (maybe?)
+        should be easy enough to log
+    > go back and make all the values from
+        these sensors actually look sensible
+        and not like random numbers
+    > implement round robin cuz the temp/humidity
+        can take annoyingly long to wait on
 Further Process Ideas:
     > use remote to trigger processes and log
         results in their own files, also log
@@ -21,12 +22,8 @@ Further Process Ideas:
         button 3: log humidity
     > using photoresisitor
         button 1: light val
-    > using tilt switch
+    > using tilt switch (maybe not necessary)
         button 4: tilt val
-
-TODO: go back and make all the values from
-    these sensors actually look sensible and
-    not like random numbers
 -----------------------------------------------*/
 
 #include "external.c"
