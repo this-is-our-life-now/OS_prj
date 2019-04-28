@@ -13,7 +13,8 @@ void setup()
     // serial for testing purposes
     Serial.begin(9600);
     
-    lcd_display( "thisisourlifenow" );
+    lcd_display( "thisisourlifenow", "ft KP,PH,&MC" );
+    lcd_display( "thisisourlifenow", "ft KP,PH,&MC" ); //just cuz
     //ir_input();
     //dht_input( TEMP );
     dht_input( HUMIDITY );
@@ -29,16 +30,22 @@ void loop(){}
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-void lcd_display( String msg )
+void lcd_display( String process, String msg )
 {
     // LCD's number of (columns, rows)
-    lcd.begin(16, 2);
-    lcd.print(msg);
+    lcd.begin( 16, 2 );
+    lcd.setCursor( 0,0 );
+    lcd.print( process );
+    lcd.print( ": " );
+    lcd.setCursor(0,1);
+    lcd.print( "  " );
+    lcd.print( msg );
 
-    int i = 0; // temporarily have it print once until process handling implemented
+    int i = 0; // temporarily have it flash once until process handling implemented
     while( i < 1 )
     {
-        Serial.println( "LCD Out:" );
+        Serial.print( process );
+        Serial.println( ":" );
         Serial.println( msg );
         // Turn off the display:
         lcd.display();
@@ -72,7 +79,7 @@ void ir_input()
     {
         if ( ir_receiver.decode( &results ) )
         {
-            lcd_display( String( results.value, HEX ) );
+            lcd_display( "IR Input", String( results.value, HEX ) );
             ir_receiver.resume();
         }
     }
@@ -86,8 +93,8 @@ DHT dht( dht_pin, DHT11 );
 /*--------------------------------------------------------
 TODO: if we use dht11 warning this thing is cheap and 
 will give nan values sometimes so we should remember to
-add some sort of abort after waiting a certain amount of
-time(for just this sensor or for all really)
+add some sort of abort on processes after waiting a
+certain amount of time(for this sensor or for all tbh)
 --------------------------------------------------------*/
 
 void dht_input( int data_type )
@@ -107,7 +114,7 @@ void dht_input( int data_type )
                     valid = true;
                 }
             }
-            lcd_display( String( input ) );
+            lcd_display( "DHT Temp", String( input ) );
         }
         else if( data_type == HUMIDITY )
         {
@@ -119,7 +126,7 @@ void dht_input( int data_type )
                     valid = true;
                 }
             }
-            lcd_display( String( input ) );
+            lcd_display( "DHT Humidity", String( input ) );
         }
     }
 }

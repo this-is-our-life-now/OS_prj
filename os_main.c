@@ -23,6 +23,10 @@ Further Process Ideas:
         button 3: light val
     > using tilt switch
         button 4: tilt val
+
+TODO: go back and make all the values from
+    these sensors actually look sensible and
+    not like random numbers
 -----------------------------------------------*/
 
 #include "external.c"
