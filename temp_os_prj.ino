@@ -15,6 +15,10 @@ const int HUM_PRCSS     = 3;
 const int WAITING   = 0;
 const int RUNNING   = 1;
 const int DONE      = 2;
+const int ABORT     = 3;
+
+const int RR_TIME = 2000; // round robin time quantum
+const int ABORT_TIME = 20000; // give up on processes that have been running for 20s, sadly this may be necessary for my cheap DHT11
 
 // initialize infrared receiver
 const int ir_pin = 8;
@@ -37,10 +41,15 @@ struct prcss
 {
     int type;
     int status;
+    int time = millis(); // to keep track of start time
+    int turn_time = millis(); // to keep track of time of that round robin turn
 };
 
 // vector of processes
 std::vector<prcss> buffer;
+
+// global current process
+prcss current;
 
 void setup()
 {
@@ -65,7 +74,7 @@ void loop()
         remote_input();
     }
     
-    if( buffer.size() != 0 && buffer[0].status != RUNNING ) // is this safe enough? double check later
+    if( buffer.size() != 0 && current.status != RUNNING )
     {
         processing();
     }
@@ -74,16 +83,20 @@ void loop()
 /*------------------------Processing Section------------------------*/
 void processing()
 {
-    buffer[0].status = RUNNING;
-    if( buffer[0].type == PHOTO_PRCSS )
+    current.status = RUNNING;
+    current.time = buffer[0].time;
+    current.type = buffer[0].type;
+    current.turn_time = millis();
+
+    if( current.type == PHOTO_PRCSS )
     {
         photo_input();
     }
-    else if( buffer[0].type == TEMP_PRCSS )
+    else if( current.type == TEMP_PRCSS )
     {
         dht_input( TEMP );
     }
-    else if( buffer[0].type == HUM_PRCSS )
+    else if( current.type == HUM_PRCSS )
     {
         dht_input( HUMIDITY );
     }
@@ -91,8 +104,18 @@ void processing()
     {
         lcd_display( "err", "unkown process" );
     }
-    buffer.erase( buffer.begin() );
 
+    if( current.status == DONE )
+    {
+        // display process running time
+        lcd_display( "prcss done", String( millis() - current.time ) );
+        buffer.erase( buffer.begin() );
+    }
+    if ( current.status == ABORT )
+    {
+        lcd_display( "prcss aborted", "took too long" ) ;
+        buffer.erase( buffer.begin() );
+    }
 }
 
 /*---------------------------LCD Section---------------------------*/
@@ -121,7 +144,6 @@ void lcd_display( String process, String msg )
 }
 
 /*---------------------------Input Section---------------------------*/
-
 void remote_input()
 {
     String code;
@@ -160,7 +182,7 @@ void remote_input()
 
 /*--------------------------Sensor Section--------------------------*/
 /*--------------------------------------------------------
-TODO: if we use dht11 warning this thing is cheap and 
+TODO: if we use dht11: warning this thing is cheap and 
 will give nan values sometimes so we should remember to
 add some sort of abort on processes after waiting a
 certain amount of time(for this sensor or for all tbh)
@@ -179,6 +201,16 @@ void dht_input( int data_type )
             {
                 valid = true;
             }
+            if( millis() - current.turn_time >= RR_TIME )
+            {
+                current.status = WAITING;
+                return;
+            }
+            else if( millis() - current.time >= ABORT_TIME )
+            {
+                current.status = ABORT;
+                return;
+            }
         }
         lcd_display( "DHT Temp", String( input ) );
     }
@@ -191,12 +223,24 @@ void dht_input( int data_type )
             {
                 valid = true;
             }
+            if( millis() - current.turn_time >= RR_TIME )
+            {
+                current.status = WAITING;
+                return;
+            }
+            else if( millis() - current.time >= ABORT_TIME )
+            {
+                current.status = ABORT;
+                return;
+            }
         }
         lcd_display( "DHT Humidity", String( input ) );
     }
+    current.status = DONE;
 }
 
 void photo_input()
 {
     lcd_display( "Photoresistor", String( analogRead( photo_pin ) ) );
+    current.status = DONE;
 }
