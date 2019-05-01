@@ -53,7 +53,6 @@ prcss current;
 
 void setup()
 {
-    // serial for testing purposes
     Serial.begin(9600);
 
     ir_receiver.enableIRIn();
@@ -111,6 +110,24 @@ void processing()
         temp_time = ( millis() - current.time ) / 1000.0 ;
         lcd_display( "prcss done", String( temp_time )+"s", 1500 );
         buffer.erase( buffer.begin() );
+        if( current.type == PHOTO_PRCSS )
+        {
+            Serial.print( "Total Processing Time for Photoresistor: " );
+            Serial.print( temp_time );
+            Serial.println( "s" );
+        }
+        if( current.type == TEMP_PRCSS )
+        {
+            Serial.print("Total Processing Time of Temperature: " );
+            Serial.print( temp_time );
+            Serial.println( "s" );
+        }
+        else if( current.type == HUM_PRCSS )
+        {
+            Serial.print("Total Processing Time of Humidity: " );
+            Serial.print( temp_time );
+            Serial.println( "s" );
+        }
     }
     if ( current.status == ABORT )
     {
@@ -208,7 +225,6 @@ void dht_input( int data_type )
             {
                 valid = true;
             }
-            Serial.println(buffer.size());
             if( ( millis() - current.turn_time >= RR_TIME ) )
             {
                 current.status = WAITING;
