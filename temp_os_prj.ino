@@ -5,20 +5,20 @@
 #include <DHT.h>
 
 // constants
-const int TEMP      = 0;
-const int HUMIDITY  = 1;
+const int TEMP          = 0;
+const int HUMIDITY      = 1;
 
 const int PHOTO_PRCSS   = 1;
 const int TEMP_PRCSS    = 2;
 const int HUM_PRCSS     = 3;
 
-const int WAITING   = 0;
-const int RUNNING   = 1;
-const int DONE      = 2;
-const int ABORT     = 3;
+const int WAITING       = 0;
+const int RUNNING       = 1;
+const int DONE          = 2;
+const int ABORT         = 3;
 
-const int RR_TIME = 4000; // round robin time quantum
-const int ABORT_TIME = 20000; // give up on processes that have been running for 20s, sadly this may be necessary for my cheap DHT11
+const int RR_TIME       = 4000; // round robin time quantum
+const int ABORT_TIME    = 20000; // give up on processes that have been running for 20s, sadly this may be necessary for my cheap DHT11
 
 // initialize infrared receiver
 const int ir_pin = 8;
@@ -204,12 +204,6 @@ void remote_input()
 }
 
 /*--------------------------Sensor Section--------------------------*/
-/*--------------------------------------------------------
-TODO: if we use dht11: warning this thing is cheap and 
-will give nan and neagative values sometimes so we should
-add some sort of abort on processes after waiting a
-certain amount of time(for this sensor or for all tbh)
---------------------------------------------------------*/
 void dht_input( int data_type )
 {
     double input = 0.0;
